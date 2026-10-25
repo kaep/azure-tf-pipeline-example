@@ -1,0 +1,32 @@
+name: Terraform deploy
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.tf'
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-init-plan:
+    env:
+      ARM_USE_OIDC: true
+      ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+      ARM_CLIENT_ID: "${{ secrets.ARM_CLIENT_ID }}"
+      ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.16.5
+      - name: Terraform init
+        run: terraform init
+      - name: Terraform plan
+        run: terraform plan
