@@ -29,4 +29,10 @@ jobs:
       - name: Terraform init
         run: terraform init
       - name: Terraform plan
-        run: terraform plan
+        run: terraform plan -out tf.plan
+      - name: Save plan
+        uses: actions/upload-artifact@v4
+        with:
+            name: terraform-plan
+            path: tf.plan
+            retention-days: 1
