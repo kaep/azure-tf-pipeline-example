@@ -36,3 +36,25 @@ jobs:
             name: terraform-plan
             path: tf.plan
             retention-days: 1
+  terraform-apply:
+    needs: terraform-init-plan
+    env:
+      ARM_USE_OIDC: true
+      ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+      ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
+      ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.16.5
+      - name: Terraform init
+        run: terraform init
+      # https://docs.github.com/en/actions/tutorials/store-and-share-data
+      - name: Download plan
+        uses: actions/download-artifact@v5
+        with:
+            name: terraform-plan
